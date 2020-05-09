@@ -12,7 +12,7 @@ def create_dir_if_not_exists(directory):
         pass
 
 
-def crop_image_and_save(image_from, image_to):
+def crop_image_and_save(image_from, image_to, *, before_crop_margin=0, after_crop_margin=0):
     """
     crop image removed black margins around the image
     """
@@ -26,6 +26,14 @@ def crop_image_and_save(image_from, image_to):
     print('image_shape:', shape)
     width = shape[1]
     height = shape[0]
+
+    rgb_data = rgb_data[
+        before_crop_margin: height - before_crop_margin, before_crop_margin: width - before_crop_margin, :]
+
+    shape = rgb_data.shape
+    width = shape[1]
+    height = shape[0]
+
     mid_width = width // 2
     mid_height = height // 2
 
@@ -57,17 +65,25 @@ def crop_image_and_save(image_from, image_to):
             break
         width_from_right += 1
 
-    margin = 10
-    left = width_from_left + margin
-    top = height_from_top + margin
-    right = width - width_from_right - margin
-    bottom = height - height_from_bottom - margin
+    left = width_from_left + after_crop_margin
+    top = height_from_top + after_crop_margin
+    right = width - width_from_right - after_crop_margin
+    bottom = height - height_from_bottom - after_crop_margin
 
     print('cropped to -> left: {}, top: {}, right: {}, bottom: {}'.format(left, top, right, bottom))
 
-    cropped = image.crop((left, top, right, bottom))
+    cropped_data = rgb_data[top:bottom, left:right, :]
+
+    cropped = Image.fromarray(cropped_data)
     cropped.save(image_to)
     print('cropped image saved to {}'.format(image_to))
+
+
+def crop_images_in_directory(from_, to_):
+    create_dir_if_not_exists(to_)
+    for f_name in os.listdir(from_):
+        crop_image_and_save('{}/{}'.format(from_, f_name), '{}/{}'.format(to_, f_name),
+                            before_crop_margin=30, after_crop_margin=10)
 
 
 
@@ -76,7 +92,4 @@ if __name__ == '__main__':
     dir_from = argv[1]
     dir_to = argv[2]
 
-    create_dir_if_not_exists(dir_to)
-
-    for f_name in os.listdir(dir_from):
-        crop_image_and_save('{}/{}'.format(dir_from, f_name), '{}/{}'.format(dir_to, f_name))
+    crop_images_in_directory(dir_from, dir_to)
