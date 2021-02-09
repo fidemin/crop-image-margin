@@ -3,5 +3,5 @@ crop image margin with black color
 
 ## Usage
 ```bash
-python conver.py {from_directory} {to_directory}
+python convert.py {from_directory} {to_directory}
 ```

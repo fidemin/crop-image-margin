@@ -28,7 +28,7 @@ def crop_image_and_save(image_from, image_to, *, before_crop_margin=0, after_cro
     height = shape[0]
 
     rgb_data = rgb_data[
-        before_crop_margin: height - before_crop_margin, before_crop_margin: width - before_crop_margin, :]
+        before_crop_margin: height - before_crop_margin, 0: width, :]
 
     shape = rgb_data.shape
     width = shape[1]
@@ -65,9 +65,9 @@ def crop_image_and_save(image_from, image_to, *, before_crop_margin=0, after_cro
             break
         width_from_right += 1
 
-    left = width_from_left + after_crop_margin
+    left = width_from_left
     top = height_from_top + after_crop_margin
-    right = width - width_from_right - after_crop_margin
+    right = width - width_from_right
     bottom = height - height_from_bottom - after_crop_margin
 
     print('cropped to -> left: {}, top: {}, right: {}, bottom: {}'.format(left, top, right, bottom))
